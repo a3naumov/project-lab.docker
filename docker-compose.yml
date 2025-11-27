@@ -1,0 +1,15 @@
+services:
+  frontend:
+    container_name: ${COMPOSE_PROJECT_NAME}-frontend
+    build:
+      context: ./src/frontend
+      dockerfile: ../../docker/frontend/Dockerfile
+    image: node:24.11.1-alpine3.22
+    volumes:
+      - type: bind
+        source: ./src/frontend
+        target: /app
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    working_dir: /app
+    tty: true
