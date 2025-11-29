@@ -1,0 +1,4 @@
+services:
+  database:
+    ports:
+      - ${DATABASE_PORT:-5432}:5432

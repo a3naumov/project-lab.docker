@@ -22,6 +22,11 @@ RUN \
 # Disable https
 ENV SERVER_NAME=:80
 
+# Install php extensions
+RUN install-php-extensions \
+    pdo_pgsql \
+;
+
 # ----------------------------------------------------------------------
 # Development
 # ----------------------------------------------------------------------

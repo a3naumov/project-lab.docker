@@ -13,6 +13,7 @@ services:
         source: ./docker/reverse-proxy/config/Caddyfile
         target: /etc/caddy/Caddyfile
         read_only: true
+    restart: always
     networks:
       - backend-network
       - frontend-network
@@ -35,7 +36,7 @@ services:
       - "host.docker.internal:host-gateway"
     working_dir: /app
     tty: true
-    restart: unless-stopped
+    restart: always
     networks:
       - backend-network
   frontend:
@@ -50,8 +51,27 @@ services:
         target: /app
     working_dir: /app
     tty: true
+    restart: always
     networks:
       - frontend-network
+  database:
+    container_name: ${COMPOSE_PROJECT_NAME}-database
+    image: postgres:18.1-alpine3.22
+    environment:
+      POSTGRES_USER: '${DATABASE_USER}'
+      POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
+      POSTGRES_DB: '${DATABASE_DB}'
+    volumes:
+      - type: volume
+        source: database-data
+        target: /var/lib/postgresql/data
+    restart: always
+    networks:
+      - backend-network
+
+volumes:
+  database-data:
+    driver: local
 
 networks:
   backend-network:
