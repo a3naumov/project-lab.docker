@@ -1,4 +1,21 @@
 services:
+  reverse-proxy:
+    container_name: ${COMPOSE_PROJECT_NAME}-reverse-proxy
+    image: caddy:2.10.2-alpine
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME:-localhost}
+      BACKEND_HOST: ${REVERSE_PROXY_BACKEND_HOST:-"backend:80"}
+      FRONTEND_HOST: ${REVERSE_PROXY_FRONTEND_HOST:-"frontend:5173"}
+    ports:
+      - "${REVERSE_PROXY_HTTPS_PORT:-443}:443"
+    volumes:
+      - type: bind
+        source: ./docker/reverse-proxy/config/Caddyfile
+        target: /etc/caddy/Caddyfile
+        read_only: true
+    networks:
+      - backend-network
+      - frontend-network
   backend:
     container_name: ${COMPOSE_PROJECT_NAME}-backend
     build:
@@ -8,8 +25,6 @@ services:
       args:
         WITH_XDEBUG: ${BACKEND_WITH_XDEBUG:-false}
     image: ${COMPOSE_PROJECT_NAME}-backend
-    ports:
-      - "${BACKEND_PORT:-8000}:80"
     volumes:
       - type: bind
         source: ./src/backend
@@ -33,8 +48,6 @@ services:
       - type: bind
         source: ./src/frontend
         target: /app
-    ports:
-      - "${FRONTEND_PORT:-5173}:5173"
     working_dir: /app
     tty: true
     networks:

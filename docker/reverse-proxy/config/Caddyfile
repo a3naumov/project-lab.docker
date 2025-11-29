@@ -1,0 +1,9 @@
+{$DOMAIN_NAME:localhost} {
+    handle /api/* {
+        reverse_proxy {$BACKEND_HOST:-backend:80}
+    }
+
+    handle {
+        reverse_proxy {$FRONTEND_HOST:-frontend:5173}
+    }
+}
